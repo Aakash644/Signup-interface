@@ -2,18 +2,23 @@
 
 This is a Node.js and Express application that provides a signup interface for users to create accounts. It offers a secure and user-friendly interface, leveraging server-side validation and database storage for user information.
 
+![signup](https://github.com/Aakash644/Signup-interface/assets/92630714/f8355cc9-a3e3-4b17-9cb5-876348372d13)
+
+
+
 ## Features
 
 - User-friendly interface for account creation
 - Server-side validation to ensure data integrity
-- Secure storage of user information in a database
+- Mailchimp API is used for the storage of customer data
+
 
 ## Installation
 
 1. Clone the repository: `git clone <repository-url>`
 2. Install dependencies: `npm install`
-3. Run the application: `npm start`
-
+3. Run the application: `node app.js`
+4. App is running at the localhost:3000.
 ## Usage
 
 1. Access the signup interface through the provided URL.
