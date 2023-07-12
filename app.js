@@ -2,12 +2,13 @@ const express=require("express");
 const got = require("got"); //npm install got@9.6.0
 const bodyParser=require("body-parser");
 const app=express();
-const mailchimp = require("@mailchimp/mailchimp_marketing");
+const mongoose=require("mongoose");
+mongoose.connect('mongodb://127.0.0.1:27017/student',{UseNewUrlParser:true});
 
-mailchimp.setConfig({
-  apiKey: "your_api_key",
-  server: "your_server_id",
-});
+
+
+const studentschema=new mongoose.Schema({fname:String,lname:String,email:String,password:String});
+const customer=mongoose.model("customerdata",studentschema);
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
@@ -19,7 +20,8 @@ app.post('/',async function(req,res){
     const fname=req.body.Fname;
     const lname=req.body.Lname;
     const email=req.body.Email;
-    const listId="2f6105ab43";
+    const password=req.body.Password;
+  const data={fname:fname,lname:lname,email:email,password:password};
    
     try{
         //tocheck api connection
@@ -28,14 +30,9 @@ app.post('/',async function(req,res){
 
 
         
-        const response = await mailchimp.lists.addListMember(listId, {
-            email_address:email,
-            status: "subscribed",
-            merge_fields: {
-              FNAME: fname,
-              LNAME: lname
-            }
-          });
+        const response = await customer(data).save();
+            
+          
           console.log(response);
           res.sendFile(__dirname+"/success.html");
 
@@ -51,4 +48,29 @@ app.post('/failure',function(req,res){
     res.sendFile(__dirname+"/signup.html");
 })
 
-app.listen(3000,()=> console.log("listening on port 3000"));
+app.get('/login',function(req,res){
+  res.sendFile(__dirname+"/login.html");
+});
+
+app.post('/login',async function(req,res){
+  
+  try {
+    // check if the user exists
+    const user = await customer.findOne({ email:req.body.Email });
+    if (user) {
+      //check if password matches
+      const result = req.body.password === user.password;
+      if (result) {
+        res.sendFile(__dirname+'/success.html')
+      } else {
+        res.sendFile(__dirname+'/login.html')
+      }
+    } else {
+      res.sendFile(__dirname+'/login.html')
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.listen(4000,()=> console.log("listening on port 4000"));
